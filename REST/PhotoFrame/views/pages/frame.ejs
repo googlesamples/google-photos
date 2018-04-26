@@ -1,0 +1,38 @@
+<% include ../partials/head %>
+<section class="sample-content">
+	<div>
+		<h2>Photo frame preview</h2>
+    	<p class="subhead mdl-color-text--grey-700">Welcome to the photo frame sample. Select an option above to load images from your Google Photos library.
+        	<br />Select a photo or use the "View in frame" button to start your photo frame experience!
+    		</p>
+	</div>
+	<div>
+   	 	<p id="preview-description" style="display: none;">
+        	<div class="snippet">
+				<span id="images-count">0</span> images loaded from
+        		<pre id="images-source">-</pre>
+			</div>
+    	</p>
+	</div>
+	<div id="images-container"></div>
+	<div id="images_empty" style="display:none">
+	 		<img src="/imgs/null-results.png">
+	 		<p>No results, try searching again</p>
+	</div>
+</section>
+
+
+<div class="floating-button">
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id="startSlideshow">
+        <i class="material-icons">fullscreen</i>
+		<span class="float-btn-label">View in frame</span>
+    </button>
+</div>
+
+<% include ../partials/dialogs %>
+
+<% include ../partials/js %>
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+<script src="/js/frame.js"></script>
+
+<% include ../partials/footer %>

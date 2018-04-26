@@ -7,18 +7,10 @@ The Library API lets you read, write and share photos & videos in Google Photos.
 ## Samples
 
 The [REST/Photoframe](REST/Photoframe) sample shows how to use the REST API in a Node.JS web application to build an interactive photo frame that loads
-photos from a user's Google Photos library. It is build with express.js and
-bootstrap.js.
+photos from a user's Google Photos library. It is built with express.js.
 
-### Running the sample
-Follow the [Get Started guide in the developer documentation](https://developers.google.com/photos/guides) to set up a Google developer 
-project and enable the *Google Photos Library API*. Next, retrieve OAuth 2.0
-credentials for a web application. Add the *client id* and *client secret* to
-the file `auth.js`.
-
-Next, install the dependencies by running `npm install` in the directory.
-
-You can now start the server locally by running `node app.js`.
+### Running the samples
+Follow the README for the [REST/Photoframe](REST/Photoframe) sample for steps on how to get started.
 
 ## Support
 

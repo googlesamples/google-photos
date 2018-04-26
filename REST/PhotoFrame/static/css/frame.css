@@ -1,0 +1,233 @@
+/*
+ * Copyright 2018 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.thumbnail {
+  height: 200px;
+  padding: 3px;
+}
+
+#startSlideshow {
+  z-index: 900;
+}
+
+#userAvatar {
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  margin: 5px;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.album-title {
+  margin-right: 16px;
+}
+
+/* Frame page */
+
+.sample-content {
+  padding: 2.5% 7.5%;
+  margin: 0 auto;
+}
+
+.subhead {
+  font-size: 1.2em;
+}
+
+#rowDateExact,
+#rowDateRange {
+  padding: 16px;
+  background: #f5f5f5;
+  margin-bottom: 16px;
+}
+
+#images_empty {
+  padding: 40px 0;
+  text-align: center;
+}
+
+.mdl-list__item {
+  padding: 0;
+  overflow: visible;
+}
+
+.mdl-list__item--two-line {
+  height: 96px;
+  width: 840px;
+}
+
+.snippet {
+  background: #efefef;
+  padding: 16px;
+  overflow: auto;
+}
+
+.floating-button {
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+}
+
+.fancybox-bg {
+  opacity: 1 !important;
+}
+
+.loading-dialog {
+  position: fixed;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  z-index: 1000;
+  text-align: center;
+}
+
+.loading-dialog h1 {
+  color: #ffffff;
+}
+
+#error {
+  background: lightcoral;
+  padding: 1.25% 7.5%;
+}
+
+/*login*/
+
+#images-container,
+#images_empty {
+  padding-top: 2.5%;
+}
+
+.demo-content {
+  border-radius: 2px;
+  padding: 80px 56px;
+  margin-bottom: 80px;
+}
+
+.login-img {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.login-img img {
+  width: 80%;
+}
+
+/*Special Google Photos Button based on MDL button styles */
+
+.gp-button {
+  border: none;
+  border-radius: 2px;
+  color: rgb(0, 0, 0);
+  position: relative;
+  height: 40px;
+  margin: 0;
+  min-width: 241px;
+  padding: 0 16px 0 48px;
+  display: inline-block;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  overflow: hidden;
+  text-transform: uppercase;
+  will-change: box-shadow;
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: left;
+  line-height: 40px;
+  vertical-align: middle;
+  background-color: rgba(255, 255, 255, 0.20);
+  background-image: url('/imgs/logo_photos_24dp.svg');
+  background-repeat: no-repeat;
+  background-position: 8px 8px;
+}
+
+.gp-button::-moz-focus-inner {
+  border: 0;
+}
+
+.gp-button:hover {
+  background-color: rgba(158, 158, 158, 0.20);
+}
+
+.gp-button:focus:not(:active) {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.gp-button:active {
+  background-color: rgba(158, 158, 158, 0.40);
+}
+
+.gp-button.gp-button--colored {
+  color: rgb(63, 81, 181);
+}
+
+.gp-button.gp-button--colored:focus:not(:active) {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+input.gp-button[type="submit"] {
+  -webkit-appearance: none;
+}
+
+p .gp-button {
+  margin-top: 16px;
+}
+
+/*Adds the raised element to GP Photos Button */
+
+.raised {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.float-btn-label {
+  margin-left: 8px;
+}
+
+/* Increase button height just for this */
+
+.mdl-button {
+  height: 40px;
+}
+
+/*Fixing left padding on bottom row of navigation*/
+
+.mdl-layout__header-row .mdl-navigation__link:first-child {
+  padding-left: 0;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+/* Search page */
+
+.filter-group {
+  padding-top: 2vh;
+}
+
+.filter-group:last-child {
+  padding-bottom: 2vh;
+}
