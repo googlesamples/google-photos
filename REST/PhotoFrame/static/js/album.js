@@ -89,7 +89,7 @@ function listAlbums() {
         // The number of items in this album as the sub title.
         const primaryContentSubTitle =
             $('<div />')
-                .text(`(${item.totalMediaItems} items)`)
+                .text(`(${item.mediaItemsCount} items)`)
                 .addClass('mdl-list__item-sub-title');
         primaryContentRoot.append(primaryContentSubTitle);
 
