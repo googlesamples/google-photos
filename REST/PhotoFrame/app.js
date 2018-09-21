@@ -33,7 +33,6 @@ const app = express();
 const fileStore = sessionFileStore(session);
 const server = http.Server(app);
 
-
 // Use the EJS template engine
 app.set('view engine', 'ejs');
 
@@ -94,22 +93,38 @@ const sessionMiddleware = session({
   secret: 'photo frame sample',
 });
 
+// Console transport for winton.
+const consoleTransport = new winston.transports.Console();
+
+// Set up winston logging.
+const logger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.simple()
+  ),
+  transports: [
+    consoleTransport
+  ]
+});
+
 // Enable extensive logging if the DEBUG environment variable is set.
 if (process.env.DEBUG) {
   // Print all winston log levels.
-  winston.level = 'silly';
+  logger.level = 'silly';
+
   // Enable express.js debugging. This logs all received requests.
   app.use(expressWinston.logger({
-    transports:
-        [new winston.transports.Console({json: true, colorize: true})]
+    transports: [
+          consoleTransport
+        ],
+        winstonInstance: logger
   }));
   // Enable request debugging.
   require('request-promise').debug = true;
 } else {
-  // By default, only print all 'info' log level messages or below.
-  winston.level = 'verbose';
+  // By default, only print all 'verbose' log level messages or below.
+  logger.level = 'verbose';
 }
-
 
 
 // Set up static routes for hosted libraries.
@@ -187,7 +202,7 @@ app.get(
         'google', {failureRedirect: '/', failureFlash: true, session: true}),
     (req, res) => {
       // User has logged in.
-      winston.info('User has logged in.');
+      logger.info('User has logged in.');
       res.redirect('/');
     });
 
@@ -214,8 +229,8 @@ app.get('/album', (req, res) => {
 app.post('/loadFromSearch', async (req, res) => {
   const authToken = req.user.token;
 
-  winston.info('Loading images from search.');
-  winston.silly('Received form data: ', req.body);
+  logger.info('Loading images from search.');
+  logger.silly('Received form data: ', req.body);
 
   // Construct a filter for photos.
   // Other parameters are added below based on the form submission.
@@ -271,7 +286,7 @@ app.post('/loadFromAlbum', async (req, res) => {
   const userId = req.user.profile.id;
   const authToken = req.user.token;
 
-  winston.info(`Importing album: ${albumId}`);
+  logger.info(`Importing album: ${albumId}`);
 
   // To list all media in an album, construct a search request
   // where the only parameter is the album ID.
@@ -287,17 +302,17 @@ app.post('/loadFromAlbum', async (req, res) => {
 
 // Returns all albums owned by the user.
 app.get('/getAlbums', async (req, res) => {
-  winston.info('Loading albums');
+  logger.info('Loading albums');
   const userId = req.user.profile.id;
 
   // Attempt to load the albums from cache if available.
   // Temporarily caching the albums makes the app more responsive.
   const cachedAlbums = await albumCache.getItem(userId);
   if (cachedAlbums) {
-    winston.verbose('Loaded albums from cache.');
+    logger.verbose('Loaded albums from cache.');
     res.status(200).send(cachedAlbums);
   } else {
-    winston.verbose('Loading albums from API.');
+    logger.verbose('Loading albums from API.');
     // Albums not in cache, retrieve the albums from the Library API
     // and return them
     const data = await libraryApiGetAlbums(req.user.token);
@@ -327,7 +342,7 @@ app.get('/getQueue', async (req, res) => {
   const userId = req.user.profile.id;
   const authToken = req.user.token;
 
-  winston.info('Loading queue.');
+  logger.info('Loading queue.');
 
   // Attempt to load the queue from cache first. This contains full mediaItems
   // that include URLs. Note that these expire after 1 hour. The TTL on this
@@ -340,19 +355,19 @@ app.get('/getQueue', async (req, res) => {
 
   if (cachedPhotos) {
     // Items are still cached. Return them.
-    winston.verbose('Returning cached photos.');
+    logger.verbose('Returning cached photos.');
     res.status(200).send({photos: cachedPhotos, parameters: stored.parameters});
   } else if (stored && stored.parameters) {
     // Items are no longer cached. Resubmit the stored search query and return
     // the result.
-    winston.verbose(
+    logger.verbose(
         `Resubmitting filter search ${JSON.stringify(stored.parameters)}`);
     const data = await libraryApiSearch(authToken, stored.parameters);
     returnPhotos(res, userId, data, stored.parameters);
   } else {
     // No data is stored yet for the user. Return an empty response.
     // The user is likely new.
-    winston.verbose('No cached data.')
+    logger.verbose('No cached data.')
     res.status(200).send({});
   }
 });
@@ -440,7 +455,7 @@ async function libraryApiSearch(authToken, parameters) {
     // Loop while the number of photos threshold has not been met yet
     // and while there is a nextPageToken to load more items.
     do {
-      winston.info(
+      logger.info(
           `Submitting search with parameters: ${JSON.stringify(parameters)}`);
 
       // Make a POST request to search the library or album
@@ -451,7 +466,7 @@ async function libraryApiSearch(authToken, parameters) {
             auth: {'bearer': authToken},
           });
 
-      winston.debug(`Response: ${result}`);
+      logger.debug(`Response: ${result}`);
 
       // The list of media items returned may be sparse and contain missing
       // elements. Remove all invalid elements.
@@ -470,7 +485,7 @@ async function libraryApiSearch(authToken, parameters) {
       // Set the pageToken for the next request.
       parameters.pageToken = result.nextPageToken;
 
-      winston.verbose(
+      logger.verbose(
           `Found ${items.length} images in this request. Total images: ${
               photos.length}`);
 
@@ -485,10 +500,10 @@ async function libraryApiSearch(authToken, parameters) {
     // format. Otherwise extract the properties.
     error = err.error.error ||
         {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
+    logger.error(error);
   }
 
-  winston.info('Search complete.');
+  logger.info('Search complete.');
   return {photos, parameters, error};
 }
 
@@ -504,7 +519,7 @@ async function libraryApiGetAlbums(authToken) {
     // Loop while there is a nextpageToken property in the response until all
     // albums have been listed.
     do {
-      winston.verbose(`Loading albums. Received so far: ${albums.length}`);
+      logger.verbose(`Loading albums. Received so far: ${albums.length}`);
       // Make a GET request to load the albums with optional parameters (the
       // pageToken if set).
       const result = await request.get(config.apiEndpoint + '/v1/albums', {
@@ -514,10 +529,10 @@ async function libraryApiGetAlbums(authToken) {
         auth: {'bearer': authToken},
       });
 
-      winston.debug(`Response: ${result}`);
+      logger.debug(`Response: ${result}`);
 
       if (result && result.albums) {
-        winston.verbose(`Number of albums received: ${result.albums.length}`);
+        logger.verbose(`Number of albums received: ${result.albums.length}`);
         // Parse albums and add them to the list, skipping empty entries.
         const items = result.albums.filter(x => !!x);
 
@@ -534,10 +549,10 @@ async function libraryApiGetAlbums(authToken) {
     // format. Otherwise extract the properties.
     error = err.error.error ||
         {name: err.name, code: err.statusCode, message: err.message};
-    winston.error(error);
+    logger.error(error);
   }
 
-  winston.info('Albums loaded.');
+  logger.info('Albums loaded.');
   return {albums, error};
 }
 
