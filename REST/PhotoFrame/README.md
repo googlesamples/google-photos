@@ -28,7 +28,7 @@ config.oAuthclientSecret = 'ADD YOUR CLIENT SECRET';
 ```
 
 You are now ready to run the sample:
-1. Ensure [Node.JS](https://nodejs.org/) and [npm](https://www.npmjs.com/) are installed and available on your system.
+1. Ensure [Node.JS](https://nodejs.org/) and [npm](https://www.npmjs.com/) are installed and available on your system. You need Node.js v7.8.0 or later to run this sample.
 1. Navigate to the directory of this sample: `REST/PhotoFrame`.
 1. Install dependencies: Run `npm install`,
 1. Start the app: Run `node app.js`.
