@@ -21,9 +21,9 @@ const bodyParser = require('body-parser');
 const config = require('./config.js');
 const express = require('express');
 const expressWinston = require('express-winston');
+const fetch = require('node-fetch');
 const http = require('http');
 const persist = require('node-persist');
-const request = require('request-promise');
 const session = require('express-session');
 const sessionFileStore = require('session-file-store');
 const uuid = require('uuid');
@@ -36,6 +36,8 @@ const server = http.Server(app);
 // Use the EJS template engine
 app.set('view engine', 'ejs');
 
+// Disable browser-side caching for demo purposes.
+app.disable('etag');
 
 // Set up a cache for media items that expires after 55 minutes.
 // This caches the baseUrls for media items that have been selected
@@ -119,8 +121,7 @@ if (process.env.DEBUG) {
         ],
         winstonInstance: logger
   }));
-  // Enable request debugging.
-  require('request-promise').debug = true;
+
 } else {
   // By default, only print all 'verbose' log level messages or below.
   logger.level = 'verbose';
@@ -422,9 +423,9 @@ function returnPhotos(res, userId, data, searchParameter) {
 function returnError(res, data) {
   // Return the same status code that was returned in the error or use 500
   // otherwise.
-  const statusCode = data.error.code || 500;
+  const statusCode = data.error.status || 500;
   // Return the error.
-  res.status(statusCode).send(data.error);
+  res.status(statusCode).send(JSON.stringify(data.error));
 }
 
 // Constructs a date object required for the Library API.
@@ -459,12 +460,17 @@ async function libraryApiSearch(authToken, parameters) {
           `Submitting search with parameters: ${JSON.stringify(parameters)}`);
 
       // Make a POST request to search the library or album
-      const result =
-          await request.post(config.apiEndpoint + '/v1/mediaItems:search', {
-            headers: {'Content-Type': 'application/json'},
-            json: parameters,
-            auth: {'bearer': authToken},
-          });
+      const searchResponse =
+        await fetch(config.apiEndpoint + '/v1/mediaItems:search', {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
+          },
+          body: JSON.stringify(parameters)
+        });
+
+      const result = await checkStatus(searchResponse);
 
       logger.debug(`Response: ${result}`);
 
@@ -495,11 +501,8 @@ async function libraryApiSearch(authToken, parameters) {
              parameters.pageToken != null);
 
   } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
+    // Log the error and prepare to return it.
+    error = err;
     logger.error(error);
   }
 
@@ -513,7 +516,9 @@ async function libraryApiGetAlbums(authToken) {
   let albums = [];
   let nextPageToken = null;
   let error = null;
-  let parameters = {pageSize: config.albumPageSize};
+
+  let parameters = new URLSearchParams();
+  parameters.append('pageSize', config.albumPageSize);
 
   try {
     // Loop while there is a nextpageToken property in the response until all
@@ -522,12 +527,15 @@ async function libraryApiGetAlbums(authToken) {
       logger.verbose(`Loading albums. Received so far: ${albums.length}`);
       // Make a GET request to load the albums with optional parameters (the
       // pageToken if set).
-      const result = await request.get(config.apiEndpoint + '/v1/albums', {
-        headers: {'Content-Type': 'application/json'},
-        qs: parameters,
-        json: true,
-        auth: {'bearer': authToken},
+      const albumResponse = await fetch(config.apiEndpoint + '/v1/albums?' + parameters, {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + authToken
+        },
       });
+
+      const result = await checkStatus(albumResponse);
 
       logger.debug(`Response: ${result}`);
 
@@ -538,22 +546,52 @@ async function libraryApiGetAlbums(authToken) {
 
         albums = albums.concat(items);
       }
-      parameters.pageToken = result.nextPageToken;
+    if(result.nextPageToken){
+      parameters.set('pageToken', result.nextPageToken);
+    }else{
+      parameters.delete('pageToken');
+    }
+      
       // Loop until all albums have been listed and no new nextPageToken is
       // returned.
-    } while (parameters.pageToken != null);
+    } while (parameters.has('pageToken'));
 
   } catch (err) {
-    // If the error is a StatusCodeError, it contains an error.error object that
-    // should be returned. It has a name, statuscode and message in the correct
-    // format. Otherwise extract the properties.
-    error = err.error.error ||
-        {name: err.name, code: err.statusCode, message: err.message};
+    // Log the error and prepare to return it.
+    error = err;
     logger.error(error);
   }
 
   logger.info('Albums loaded.');
   return {albums, error};
+}
+
+// Return the body as JSON if the request was successful, or thrown a StatusError.
+async function checkStatus(response){
+  if (!response.ok){
+    // Throw a StatusError if a non-OK HTTP status was returned.
+    let message = "";
+    try{
+          // Try to parse the response body as JSON, in case the server returned a useful response.
+        message = await response.json();
+    } catch( err ){
+      // Ignore if no JSON payload was retrieved and use the status text instead.
+    }
+    throw new StatusError(response.status, response.statusText, message);
+  }
+
+  // If the HTTP status is OK, return the body as JSON.
+  return await response.json();
+}
+
+// Custom error that contains a status, title and a server message.
+class StatusError extends Error {
+  constructor(status, title, serverMessage, ...params) {
+    super(...params)
+    this.status = status;
+    this.statusTitle = title;
+    this.serverMessage= serverMessage;
+  }
 }
 
 // [END app]
