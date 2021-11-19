@@ -14,7 +14,7 @@
 
 // This file contains the configuration options for this sample app.
 
-const config = {};
+export const config = {};
 
 // The OAuth client ID from the Google Developers console.
 config.oAuthClientID = 'ADD YOUR CLIENT ID';
@@ -47,5 +47,3 @@ config.albumPageSize = 50;
 
 // The API end point to use. Do not change.
 config.apiEndpoint = 'https://photoslibrary.googleapis.com';
-
-module.exports = config;

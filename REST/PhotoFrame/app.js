@@ -16,18 +16,23 @@
 
 // [START app]
 
-const async = require('async');
-const bodyParser = require('body-parser');
-const config = require('./config.js');
-const express = require('express');
-const expressWinston = require('express-winston');
-const fetch = require('node-fetch');
-const http = require('http');
-const persist = require('node-persist');
-const session = require('express-session');
-const sessionFileStore = require('session-file-store');
-const uuid = require('uuid');
-const winston = require('winston');
+import bodyParser from 'body-parser';
+import express from 'express';
+import expressWinston from 'express-winston';
+import fetch from 'node-fetch';
+import http from 'http';
+import passport from 'passport';
+import path from 'path';
+import persist from 'node-persist';
+import session from 'express-session';
+import sessionFileStore from 'session-file-store';
+import winston from 'winston';
+
+import {config} from './config.js';
+import {auth} from './auth.js';
+
+// The path to the folder this file is located in.
+const dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const app = express();
 const fileStore = sessionFileStore(session);
@@ -81,8 +86,6 @@ const storage = persist.create({dir: 'persist-storage/'});
 storage.init();
 
 // Set up OAuth 2.0 authentication through the passport.js library.
-const passport = require('passport');
-const auth = require('./auth');
 auth(passport);
 
 // Set up a session middleware to handle user sessions.
@@ -130,13 +133,30 @@ if (process.env.DEBUG) {
 
 // Set up static routes for hosted libraries.
 app.use(express.static('static'));
-app.use('/js', express.static(__dirname + '/node_modules/jquery/dist/'));
+app.use('/js',
+  express.static(
+    path.join(
+      dirname,
+      '/node_modules/jquery/dist/'),
+  )
+);
+
 app.use(
-    '/fancybox',
-    express.static(__dirname + '/node_modules/@fancyapps/fancybox/dist/'));
+  '/fancybox',
+  express.static(
+    path.join(
+      dirname,
+      '/node_modules/@fancyapps/fancybox/dist/'),
+  )
+);
 app.use(
-    '/mdlite',
-    express.static(__dirname + '/node_modules/material-design-lite/dist/'));
+  '/mdlite',
+  express.static(
+    path.join(
+      dirname,
+      '/node_modules/material-design-lite/dist/'),
+  )
+);
 
 
 // Parse application/json request data.
@@ -204,7 +224,9 @@ app.get(
     (req, res) => {
       // User has logged in.
       logger.info('User has logged in.');
-      res.redirect('/');
+      req.session.save(() => {
+        res.redirect('/');
+      });      
     });
 
 // Loads the search page if the user is authenticated.
@@ -328,7 +350,7 @@ app.get('/getAlbums', async (req, res) => {
       // The cache implementation automatically clears the data when the TTL is
       // reached.
       res.status(200).send(data);
-      albumCache.setItemSync(userId, data);
+      albumCache.setItem(userId, data);
     }
   }
 });
@@ -409,10 +431,10 @@ function returnPhotos(res, userId, data, searchParameter) {
     delete searchParameter.pageSize;
 
     // Cache the media items that were loaded temporarily.
-    mediaItemCache.setItemSync(userId, data.photos);
+    mediaItemCache.setItem(userId, data.photos);
     // Store the parameters that were used to load these images. They are used
     // to resubmit the query after the cache expires.
-    storage.setItemSync(userId, {parameters: searchParameter});
+    storage.setItem(userId, {parameters: searchParameter});
 
     // Return the photos and parameters back int the response.
     res.status(200).send({photos: data.photos, parameters: searchParameter});

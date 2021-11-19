@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const config = require('./config.js');
+import {config} from './config.js';
+import {Strategy as GoogleOAuthStrategy} from 'passport-google-oauth20';
 
-const GoogleOAuthStrategy = require('passport-google-oauth20').Strategy;
-module.exports = (passport) => {
+export const auth = (passport) => {
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((user, done) => done(null, user));
   passport.use(new GoogleOAuthStrategy(
       {
         clientID: config.oAuthClientID,
         clientSecret: config.oAuthclientSecret,
-        callbackURL: config.oAuthCallbackUrl,
-        // Set the correct profile URL that does not require any additional APIs
-        userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
+        callbackURL: config.oAuthCallbackUrl
       },
       (token, refreshToken, profile, done) => done(null, {profile, token})));
 };
