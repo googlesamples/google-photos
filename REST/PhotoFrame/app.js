@@ -22,17 +22,14 @@ import expressWinston from 'express-winston';
 import fetch from 'node-fetch';
 import http from 'http';
 import passport from 'passport';
-import path from 'path';
 import persist from 'node-persist';
 import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import winston from 'winston';
 
-import {config} from './config.js';
 import {auth} from './auth.js';
-
-// The path to the folder this file is located in.
-const dirname = path.dirname(new URL(import.meta.url).pathname);
+import {config} from './config.js';
+import {fileURLToPath} from 'url';
 
 const app = express();
 const fileStore = sessionFileStore(session);
@@ -135,26 +132,26 @@ if (process.env.DEBUG) {
 app.use(express.static('static'));
 app.use('/js',
   express.static(
-    path.join(
-      dirname,
-      '/node_modules/jquery/dist/'),
+    fileURLToPath(
+      new URL('./node_modules/jquery/dist/', import.meta.url)
+    ),
   )
 );
 
 app.use(
   '/fancybox',
   express.static(
-    path.join(
-      dirname,
-      '/node_modules/@fancyapps/fancybox/dist/'),
+    fileURLToPath(
+      new URL('./node_modules/@fancyapps/fancybox/dist/', import.meta.url)
+    ),
   )
 );
 app.use(
   '/mdlite',
   express.static(
-    path.join(
-      dirname,
-      '/node_modules/material-design-lite/dist/'),
+    fileURLToPath(
+      new URL('./node_modules/material-design-lite/dist/', import.meta.url)
+    ),
   )
 );
 
@@ -226,7 +223,7 @@ app.get(
       logger.info('User has logged in.');
       req.session.save(() => {
         res.redirect('/');
-      });      
+      });
     });
 
 // Loads the search page if the user is authenticated.
