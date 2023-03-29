@@ -19,7 +19,7 @@ Before you can run this sample, you must set up a Google Developers project and 
 1. Set up a Google Developers Project and enable the **Google Photos Library API**.
 1. In your project, set up new OAuth credentials for a web server application. Set the authorized JavaScript origin to `http://127.0.0.1` and the authorized redirect URL to `http://127.0.0.1:8080/auth/google/callback` if you are running the app locally.
 1. The console will display your authentication credentials. Add the `Client ID` and `Client secret` to the file `config.js`, replacing the placeholder values:
-```
+```node
 // The OAuth client ID from the Google Developers console.
 config.oAuthClientID = 'ADD YOUR CLIENT ID';
 
@@ -40,7 +40,7 @@ Make sure that you have configured the `Client ID` and the `Client secret` in th
 Also check that the URLs configured for these credentials match how you access the server. By default this is configured for 127.0.0.1 (localhost) on port 8080.
 
 You can also start the app with additional debug logging by setting the `DEBUG` environment variable to `true`. For example:
-```
+```properties
 DEBUG=TRUE node app.js
 ```
 
