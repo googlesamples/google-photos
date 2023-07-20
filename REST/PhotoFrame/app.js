@@ -198,12 +198,14 @@ app.get('/', (req, res) => {
   }
 });
 
-// GET request to log out the user.
+// POST request to log out the user.
 // Destroy the current session and redirect back to the log in screen.
-app.get('/logout', (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.redirect('/');
+app.post('/logout', function(req, res, next) {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+    req.session.destroy();
+  });
 });
 
 // Star the OAuth login process for Google.
