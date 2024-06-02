@@ -39,10 +39,10 @@ config.scopes = [
 // The number of photos to load for search requests.
 config.photosToLoad = 150;
 
-// The page size to use for search requests. 100 is reccommended.
+// The page size to use for search requests. 100 is recommended.
 config.searchPageSize = 100;
 
-// The page size to use for the listing albums request. 50 is reccommended.
+// The page size to use for the listing albums request. 50 is recommended.
 config.albumPageSize = 50;
 
 // The API end point to use. Do not change.
