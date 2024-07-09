@@ -142,7 +142,7 @@ app.use(
   '/fancybox',
   express.static(
     fileURLToPath(
-      new URL('./node_modules/@fancyapps/fancybox/dist/', import.meta.url)
+      new URL('./node_modules/@fancyapps/ui/dist/', import.meta.url)
     ),
   )
 );
@@ -201,9 +201,11 @@ app.get('/', (req, res) => {
 // GET request to log out the user.
 // Destroy the current session and redirect back to the log in screen.
 app.get('/logout', (req, res) => {
-  req.logout();
-  req.session.destroy();
-  res.redirect('/');
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    req.session.destroy();
+    res.redirect('/');
+  });
 });
 
 // Star the OAuth login process for Google.
@@ -238,6 +240,9 @@ app.get('/album', (req, res) => {
   renderIfAuthenticated(req, res, 'pages/album');
 });
 
+app.get('/fancyboxcfg', (req, res) => {
+    res.json( config.fancybox );
+});
 
 // Handles form submissions from the search page.
 // The user has made a selection and wants to load photos into the photo frame

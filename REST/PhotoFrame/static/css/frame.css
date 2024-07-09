@@ -87,6 +87,10 @@ pre {
   opacity: 1 !important;
 }
 
+.fancybox__container {
+  background-color: rgba(24, 24, 27, 1.0)
+}
+
 .loading-dialog {
   position: fixed;
   margin: 0;

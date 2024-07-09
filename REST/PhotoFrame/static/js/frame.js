@@ -47,6 +47,13 @@ function showPreview(source, mediaItems) {
     $('startSlideshow').removeClass('disabled');
   }
 
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+  shuffleArray(mediaItems);
   // Loop over each media item and render it.
   $.each(mediaItems, (i, item) => {
     // Construct a thumbnail URL from the item's base URL at a small pixel size.
@@ -78,8 +85,8 @@ function showPreview(source, mediaItems) {
                                 .attr('data-height', item.mediaMetadata.height);
     // Add the thumbnail image to the link to the full image for fancybox.
     const thumbnailImage = $('<img />')
-                               .attr('src', thumbnailUrl)
-                               .attr('alt', captionText)
+                              // .attr('src', thumbnailUrl)
+                              // .attr('alt', captionText)
                                .addClass('img-fluid rounded thumbnail');
     linkToFullImage.append(thumbnailImage);
 
@@ -126,28 +133,16 @@ function loadQueue() {
 $(document).ready(() => {
   // Load the queue of photos selected by the user for the photo
   loadQueue();
-
-  // Set up the fancybox image gallery.
-  $().fancybox({
-    selector: '[data-fancybox="gallery"]',
-    loop: true,
-    buttons: ['slideShow', 'fullScreen', 'close'],
-    image: {preload: true},
-    transitionEffect: 'fade',
-    transitionDuration: 1000,
-    fullScreen: {autoStart: false},
-    // Automatically advance after 3s to next photo.
-    slideShow: {autoStart: true, speed: 3000},
-    // Display the contents figcaption element as the caption of an image
-    caption: function(instance, item) {
-      return $(this).find('figcaption').html();
-    }
+  
+  $.get( "/fancyboxcfg", function( data ) {
+    // Set up the fancybox image gallery.
+    Fancybox.bind('[data-fancybox="gallery"]', data);
   });
 
   // Clicking the 'view fullscreen' button opens the gallery from the first
   // image.
   $('#startSlideshow')
-      .on('click', (e) => $('#images-container a').first().click());
+    .on('click', (e) => Fancybox.fromSelector('[data-fancybox="gallery"]') )
 
   // Clicking log out opens the log out screen.
   $('#logout').on('click', (e) => {

@@ -47,3 +47,10 @@ config.albumPageSize = 50;
 
 // The API end point to use. Do not change.
 config.apiEndpoint = 'https://photoslibrary.googleapis.com';
+
+config.fancybox = {
+  Slideshow: { playOnStart: true, timeout:20e3 },
+  Thumbs: { showOnStart: false },
+  Fullscreen: { autoStart: true },
+  hideScrollbar: true,
+};
