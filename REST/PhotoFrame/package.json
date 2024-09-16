@@ -13,9 +13,9 @@
   "type": "module",
   "dependencies": {
     "@fancyapps/fancybox": "^3.5.7",
-    "body-parser": "^1.19.1",
+    "body-parser": "^1.20.3",
     "ejs": "^3.1.7",
-    "express": "^4.18.1",
+    "express": "^4.21.0",
     "express-session": "^1.17.2",
     "express-winston": "^4.2.0",
     "jquery": "^3.6.0",
